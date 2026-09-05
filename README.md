@@ -85,3 +85,4 @@ cd frontend && npm run build  # must succeed
 ```
 
 <!-- Deployed: 2026-09-05T07:11:56Z -->
+<!-- Git config fixed: 2026-09-05T08:09:07Z -->
