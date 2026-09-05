@@ -18,9 +18,20 @@ async function jfetch(url: string, opts?: RequestInit){
 }
 
 export async function login(email:string, password:string){
-  const r = await fetch(`${API}/api/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email,password})})
-  if(!r.ok) throw new Error(await r.text())
-  return r.json()
+  try {
+    const r = await fetch(`${API}/api/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email,password})})
+    if(!r.ok) {
+      const t = await r.text().catch(()=> '');
+      throw new Error(t || `Login failed: ${r.status} ${r.statusText} (API: ${API})`)
+    }
+    return r.json()
+  } catch (e:any) {
+    // Network/CORS error — "Failed to fetch" is the generic browser message for CORS, DNS, or offline
+    if (e.message === 'Failed to fetch' || e.name === 'TypeError') {
+      throw new Error(`Cannot connect to backend at ${API}/api/auth/login — is the backend running? For local: ensure 'python -m uvicorn app.main:app --host 127.0.0.1 --port 8000' is running. For Vercel/Firebase production: set NEXT_PUBLIC_API_URL to your deployed backend URL (e.g. https://thyroid-lab-api.vercel.app) and redeploy. Current API: ${API} — ${e.message}`)
+    }
+    throw e
+  }
 }
 export async function getMe(){ return jfetch('/api/auth/me') }
 export async function getDashboard(){ return jfetch('/api/dashboard/stats') }
