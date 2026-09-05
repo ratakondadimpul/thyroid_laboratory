@@ -1,4 +1,5 @@
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app') ? '' : "http://localhost:8000");
+// '' means same-origin /api (for monorepo Vercel with api/index.py), localhost for local dev
 
 function authHeader(){
   if(typeof window==='undefined') return {}
