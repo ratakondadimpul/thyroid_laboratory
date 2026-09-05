@@ -1,3 +1,11 @@
 {
-  "rewrites": [{ "source": "/(.*)", "dest": "/api/index.py" }]
+  "version": 2,
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python", "config": { "runtime": "python3.11", "maxDuration": 30 } }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/health", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/api/index.py" }
+  ]
 }

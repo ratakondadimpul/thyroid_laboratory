@@ -1,0 +1,3 @@
+# Vercel Python function deps for api/index.py (monorepo) — reuses backend deps
+# Vercel auto-installs api/requirements.txt for api/index.py lambda
+-r ../backend/requirements.txt

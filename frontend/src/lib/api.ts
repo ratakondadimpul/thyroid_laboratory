@@ -1,5 +1,19 @@
-const API = process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app') ? '' : "http://localhost:8000");
-// '' means same-origin /api (for monorepo Vercel with api/index.py), localhost for local dev
+// Monorepo Vercel: frontend + FastAPI on same origin via api/index.py + vercel.json rewrites
+// - Production (Vercel, Firebase Hosting, custom domain): same-origin '' => fetch('/api/auth/login') -> https://your-domain.vercel.app/api/auth/login -> api/index.py
+// - Local dev (localhost:3001): fallback to http://localhost:8000 (via next.config.ts rewrites only in NODE_ENV=development)
+// NEVER default to localhost in production — causes DNS_HOSTNAME_RESOLVED_PRIVATE / CORS
+const API = (() => {
+  const env = process.env.NEXT_PUBLIC_API_URL;
+  if (env !== undefined && env !== null && env !== "") return env; // explicit override: e.g. https://api.run.app or '' forced
+  // No env set: same-origin in prod (Vercel/Firebase/custom domain), localhost only for local dev
+  if (typeof window !== 'undefined') {
+    const h = window.location.hostname;
+    if (h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0') return "http://localhost:8000";
+    return ""; // production same-origin
+  }
+  // SSR build: empty for same-origin; local server still needs rewrites via next.config.ts
+  return "";
+})();
 
 function authHeader(){
   if(typeof window==='undefined') return {}
